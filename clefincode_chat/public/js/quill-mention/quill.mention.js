@@ -132,13 +132,13 @@ class Mention {
 		return true;
 	}
 
-	showMentionList() {
-		this.quill.is_open = 1
-		this.mentionContainer.style.visibility = "hidden";
-		this.mentionContainer.style.display = "";
-		this.setMentionContainerPosition();
-		this.isOpen = true;
-	}
+	// showMentionList() {
+	// 	this.quill.is_open = 1
+	// 	this.mentionContainer.style.visibility = "hidden";
+	// 	this.mentionContainer.style.display = "";
+	// 	this.setMentionContainerPosition();
+	// 	this.isOpen = true;
+	// }
 
 	hideMentionList() {
 		setTimeout(() => {
@@ -250,7 +250,7 @@ class Mention {
 			}
 			this.itemIndex = 0;
 			this.highlightItem();
-			this.showMentionList();
+			// this.showMentionList();
 		} else {
 			this.hideMentionList();
 		}

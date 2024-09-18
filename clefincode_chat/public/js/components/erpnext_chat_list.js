@@ -33,7 +33,7 @@ export default class ChatList {
 
   setup_header() {    
     let chat_list_header_html = ``;
-    if(this.user_type == "system_user"){
+    if(this.user_type == "system_user" && frappe.user.has_role("Chat Administrator")){
       chat_list_header_html = `<div class='chat-list-header'>
 				<h3>${__("Chats")}</h3>
         <div class='chat-list-icons'> 
@@ -108,7 +108,7 @@ export default class ChatList {
       this.num_of_results = results_info.num_of_results;
       if (this.num_of_results == 0) {
         let empty_chat_list_container = ``;
-        if(this.user_type == "system_user"){
+        if(this.user_type == "system_user" && frappe.user.has_role("Chat Administrator")){
           empty_chat_list_container = `
           <div class="empty-chat-list-container">
             <div>
@@ -125,6 +125,7 @@ export default class ChatList {
               <img src="/assets/frappe/images/ui-states/list-empty-state.svg" alt="Generic Empty State" class="null-state" style="height:60px!important">
             </div>
             <div class="my-2">You don't have any conversation yet</div>
+            <div class="btn btn-primary chat-list-primary-btn2">Request Support</div>
           </div>
           `;
         }        
@@ -338,6 +339,58 @@ export default class ChatList {
       });
 
     });    
+
+    $(".chat-list-primary-btn2").on("click", async function () { 
+      const room = await check_if_website_user_has_support_channel(me.user_email);
+      let chat_window ;
+      if(room){
+        if (check_if_chat_window_open(room , "room")){
+          $(".expand-chat-window[data-id|='"+room+"']").click();
+          return
+          }
+
+        chat_window = new ChatWindow({
+          profile: {
+            room: room,
+          },
+        });
+      }else{
+        if (check_if_chat_window_open("ClefinCode Support" , "contact")){
+          $(".expand-chat-window[data-id|='ClefinCode Support']").click();
+          return
+          }
+          
+        chat_window = new ChatWindow({
+          profile: {
+            contact:"Highnoon Support",
+          },
+        });
+      }
+      
+
+      let profile = {
+        is_admin: me.is_admin,
+        user: me.user,
+        user_email: me.user_email,
+        time_zone: me.time_zone,
+        user_type: me.user_type,
+        is_limited_user: me.is_limited_user,
+        room: room,
+        room_name: "Highnoon Support",
+        room_type: "Group",
+        // contact: contact,
+        is_first_message: 1,
+        // platform: platform,
+        is_website_support_group: 1
+      };
+
+      this.chat_space = new ChatSpace({
+        $wrapper: chat_window.$chat_window,
+        profile: profile,
+      });
+
+    }); 
+
 
     setTimeout(() => {
       $(".chat-rooms-group-container").on("scroll", function () {
